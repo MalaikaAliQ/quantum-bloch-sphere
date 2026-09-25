@@ -39,28 +39,31 @@ let showProjections = true;
 let animSpeed = 1.5;
 let kickbackStep = 1;
 
-// Change listeners
-let listeners = new Set();
+// State snapshot cache for referential equality in useSyncExternalStore
+let cachedSnapshot = null;
 
-function emitChange() {
-  listeners.forEach((l) => l());
+function getSnapshot() {
+  if (!cachedSnapshot) {
+    cachedSnapshot = {
+      qState: { ...qState },
+      qTargetState: { ...qTargetState },
+      activeModule,
+      isLarmorRunning,
+      larmorTime,
+      larmorFrame,
+      isWeakMeasuring,
+      showTrails,
+      showProjections,
+      animSpeed,
+      kickbackStep,
+    };
+  }
+  return cachedSnapshot;
 }
 
-// Snapshot for useSyncExternalStore
-function getSnapshot() {
-  return {
-    qState: { ...qState },
-    qTargetState: { ...qTargetState },
-    activeModule,
-    isLarmorRunning,
-    larmorTime,
-    larmorFrame,
-    isWeakMeasuring,
-    showTrails,
-    showProjections,
-    animSpeed,
-    kickbackStep,
-  };
+function emitChange() {
+  cachedSnapshot = null;
+  listeners.forEach((l) => l());
 }
 
 function subscribe(listener) {
@@ -338,10 +341,16 @@ export function updateLarmorPhysics(dt, detuning, rabiFreq) {
     qState.theta = newTheta;
     qState.phi = ((newPhi % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
     qState.radius = 1.0;
+    emitChange();
     return true;
   }
   return false;
 }
+
+
+
+
+
 
 export function applyDecoherenceStep(type) {
   if (type === 't1') {

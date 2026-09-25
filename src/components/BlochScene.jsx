@@ -94,13 +94,10 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
 
       // Basis markers & labels
       const createMarker = (pos, color, text) => {
-        group.add(new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 12), new THREE.MeshBasicMaterial({ color })).clone().translateX(pos.x).translateY(pos.y).translateZ(pos.z) || (() => {
-          const dot = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 12), new THREE.MeshBasicMaterial({ color }));
-          dot.position.copy(pos);
-          return dot;
-        })());
-        // Recreate properly
-        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 12), new THREE.MeshBasicMaterial({ color }));
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.035, 12, 12),
+          new THREE.MeshBasicMaterial({ color })
+        );
         dot.position.copy(pos);
         group.add(dot);
 
