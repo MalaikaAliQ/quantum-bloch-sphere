@@ -39,6 +39,8 @@ let showProjections = true;
 let animSpeed = 1.5;
 // Change listeners Set
 const listeners = new Set();
+// Prevent aggressive tree‑shaking removal
+void listeners;
 
 // State snapshot cache for referential equality in useSyncExternalStore
 let cachedSnapshot = null;
