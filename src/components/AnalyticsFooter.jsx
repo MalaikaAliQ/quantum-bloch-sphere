@@ -6,9 +6,9 @@ export default function AnalyticsFooter() {
   const { qState } = useQuantumStore();
   const phasorRef = useRef(null);
 
-  const theta = qState.theta;
-  const phi = qState.phi;
-  const r = qState.radius;
+  const theta = qState?.theta ?? 0;
+  const phi = qState?.phi ?? 0;
+  const r = qState?.radius ?? 1.0;
 
   const cosHalf = Math.cos(theta / 2);
   const sinHalf = Math.sin(theta / 2);
@@ -41,10 +41,11 @@ export default function AnalyticsFooter() {
   const purity = (0.5 * (1 + r * r)).toFixed(2);
   const l1 = Math.max(1e-12, (1 + r) / 2);
   const l2 = Math.max(1e-12, (1 - r) / 2);
-  let entropy = 0;
+  let rawEntropy = 0;
   if (l1 > 1e-10 && l1 < 0.999999) {
-    entropy = -(l1 * Math.log2(l1) + l2 * Math.log2(l2));
+    rawEntropy = -(l1 * Math.log2(l1) + l2 * Math.log2(l2));
   }
+  const entropy = Number.isFinite(rawEntropy) ? rawEntropy.toFixed(2) : '0.00';
 
   // State string
   const betaSign = betaImag >= 0 ? '+' : '-';
@@ -162,7 +163,7 @@ export default function AnalyticsFooter() {
         <div className="space-y-1">
           <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
             <span>Density Matrix ρ</span>
-            <span className="text-purple-300 font-bold">γ={purity} | S={entropy.toFixed(2)}</span>
+            <span className="text-purple-300 font-bold">γ={purity} | S={entropy}</span>
           </div>
           <div className="p-1.5 rounded bg-slate-950/80 border border-slate-800/80 font-mono text-[10px] text-purple-200 overflow-x-auto">
             <KaTeXBlock math={matrixLatex} display={true} />
