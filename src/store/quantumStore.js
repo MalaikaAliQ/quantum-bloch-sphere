@@ -37,6 +37,7 @@ let weakMeasureInterval = null;
 let showTrails = true;
 let showProjections = true;
 let animSpeed = 1.5;
+let kickbackStep = 1;
 // Change listeners Set
 const listeners = new Set();
 // Prevent aggressive tree‑shaking removal
