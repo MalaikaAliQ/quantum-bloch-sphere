@@ -26,7 +26,7 @@ export default function StandardPanel() {
           <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
             <Sliders className="w-3.5 h-3.5" /> Polar &amp; Azimuthal Angles
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">(θ, φ)</span>
+          <span className="text-[11px] text-slate-400 font-mono">(θ, φ)</span>
         </div>
 
         <div className="space-y-1">
@@ -37,7 +37,7 @@ export default function StandardPanel() {
           <input type="range" min="0" max="3.14159265" step="0.01" value={qState.theta}
             onChange={(e) => setThetaDirect(parseFloat(e.target.value))}
             className="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
-          <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+          <div className="flex justify-between text-[11px] text-slate-500 font-mono">
             <span>0 (|0⟩)</span><span>π/2 (Equator)</span><span>π (|1⟩)</span>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function StandardPanel() {
           <input type="range" min="0" max="6.2831853" step="0.01" value={qState.phi}
             onChange={(e) => setPhiDirect(parseFloat(e.target.value))}
             className="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
-          <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+          <div className="flex justify-between text-[11px] text-slate-500 font-mono">
             <span>0 (+x)</span><span>π/2 (+y)</span><span>π (-x)</span><span>2π</span>
           </div>
         </div>
@@ -75,7 +75,7 @@ export default function StandardPanel() {
           <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
             <Binary className="w-3.5 h-3.5" /> Single-Qubit Unitary Gates
           </span>
-          <span className="text-[10px] text-slate-500">SU(2)</span>
+          <span className="text-[11px] text-slate-500">SU(2)</span>
         </div>
         <div className="grid grid-cols-4 gap-1.5 font-mono text-xs">
           {[
@@ -89,9 +89,9 @@ export default function StandardPanel() {
             { g: 'T_DAG', label: '-π/4 Z', cls: 'border-pink-500/30 hover:bg-pink-950/30 text-pink-300', display: 'T†' },
           ].map(({ g, label, cls, display }) => (
             <button key={g} onClick={() => executeGate(g)}
-              className={`p-2 rounded-lg bg-slate-900 border ${cls} font-bold transition flex flex-col items-center`}>
+              className={`px-1 py-2 rounded-lg bg-slate-900 border ${cls} font-bold transition flex flex-col items-center`}>
               <span>{display || g}</span>
-              <span className="text-[8px] text-slate-500 font-normal">{label}</span>
+              <span className="text-[10px] leading-tight whitespace-nowrap tracking-tight text-slate-400 font-normal">{label}</span>
             </button>
           ))}
         </div>
@@ -112,11 +112,11 @@ export default function StandardPanel() {
           <span className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
             <Eye className="w-3.5 h-3.5" /> Quantum Measurement Engine
           </span>
-          <span className="text-[10px] text-slate-500">Von Neumann &amp; Weak</span>
+          <span className="text-[11px] text-slate-500 text-right shrink-0">Von Neumann &amp; Weak</span>
         </div>
 
         <div className="space-y-1.5">
-          <span className="text-[10px] text-slate-400 font-mono">Sharp Projective Measurement:</span>
+          <span className="text-[11px] text-slate-400 font-mono">Sharp Projective Measurement:</span>
           <div className="grid grid-cols-3 gap-1.5 font-mono text-xs">
             <button onClick={() => handleMeasure('Z')} className="py-1.5 bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/60 rounded-lg text-rose-200">Z-Basis</button>
             <button onClick={() => handleMeasure('X')} className="py-1.5 bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/60 rounded-lg text-rose-200">X-Basis</button>
@@ -125,14 +125,14 @@ export default function StandardPanel() {
         </div>
 
         <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
-          <div className="flex justify-between items-center text-[10px]">
+          <div className="flex justify-between items-center text-[11px]">
             <span className="text-amber-300 font-mono">Continuous Weak Measurement (Z):</span>
             <button onClick={toggleWeakMeasurement}
-              className={`px-2 py-0.5 rounded border font-mono ${isWeakMeasuring ? 'bg-rose-500/20 border-rose-500/40 text-rose-300' : 'bg-amber-500/20 border-amber-500/40 text-amber-300'}`}>
+              className={`shrink-0 whitespace-nowrap px-2 py-0.5 rounded border font-mono ${isWeakMeasuring ? 'bg-rose-500/20 border-rose-500/40 text-rose-300' : 'bg-amber-500/20 border-amber-500/40 text-amber-300'}`}>
               {isWeakMeasuring ? 'Halt POVM' : 'Start Diffusion'}
             </button>
           </div>
-          <p className="text-[9px] text-slate-400 leading-tight">
+          <p className="text-[10.5px] text-slate-400 leading-tight">
             Simulates stochastic quantum trajectory diffusion with weak Kraus operators showing gradual wave-function collapse.
           </p>
         </div>

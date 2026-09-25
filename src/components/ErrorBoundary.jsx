@@ -43,7 +43,7 @@ export default class ErrorBoundary extends React.Component {
 
             <button
               onClick={this.handleReload}
-              className="w-full py-2.5 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs flex items-center justify-center gap-2 transition font-mono shadow-lg"
+              className="w-full py-2.5 px-4 rounded-xl bg-cyan-700 hover:bg-cyan-600 text-white font-medium text-xs flex items-center justify-center gap-2 transition font-mono shadow-lg"
             >
               <RefreshCw className="w-4 h-4" /> Re-Initialize Quantum Engine
             </button>

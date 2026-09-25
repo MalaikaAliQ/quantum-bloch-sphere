@@ -6,7 +6,7 @@ import KaTeXBlock, { renderKaTeX } from '../KaTeXBlock';
 const STEP_DESCRIPTIONS = [
   'Step 1: System initialized. Target qubit q₁ set to state |1⟩.',
   'Step 2: Hadamards applied! Control is |+⟩, Target is |−⟩ (an eigenstate of Pauli X with eigenvalue λ = −1).',
-  'Step 3: CNOT Phase Kickback! The eigenvalue −1 = e^{iπ} migrates to the control qubit (|+⟩ → |−⟩). Notice the target remains unchanged!',
+  'Step 3: CNOT Phase Kickback! The eigenvalue −1 = e^(iπ) migrates to the control qubit (|+⟩ → |−⟩). Notice the target remains unchanged!',
   'Step 4: Final Hadamard on control qubit maps |−⟩ → |1⟩. Measurement of q₀ yields |1⟩ with 100% certainty!',
 ];
 
@@ -40,8 +40,8 @@ export default function KickbackPanel() {
         <p className="text-[11px] text-slate-300 leading-relaxed">
           When target qubit q₁ is an eigenstate of unitary operator U, a controlled operation C-U migrates the relative phase factor directly onto the control qubit:
         </p>
-        <div className="p-2 rounded bg-slate-900 border border-cyan-900/40 text-[10px] font-mono text-cyan-300">
-          <KaTeXBlock math="C\\text{-}U\\left[\\frac{|0\\rangle + |1\\rangle}{\\sqrt{2}}|u\\rangle\\right] = \\left[\\frac{|0\\rangle + e^{i\\phi}|1\\rangle}{\\sqrt{2}}\\right]|u\\rangle" />
+        <div className="p-2 rounded bg-slate-900 border border-cyan-900/40 text-[11px] font-mono text-cyan-300">
+          <KaTeXBlock math={"C\\text{-}U\\left[\\frac{|0\\rangle + |1\\rangle}{\\sqrt{2}}|u\\rangle\\right] = \\left[\\frac{|0\\rangle + e^{i\\phi}|1\\rangle}{\\sqrt{2}}\\right]|u\\rangle"} />
         </div>
       </div>
 

@@ -44,7 +44,7 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
       console.error('WebGL initialization error:', err);
       const fallback = document.createElement('div');
       fallback.className = 'w-full h-full flex flex-col items-center justify-center text-cyan-300 font-mono text-xs p-4 text-center';
-      fallback.innerHTML = '<p class="font-bold text-amber-400">WebGL 3D Context Unavailable</p><p class="text-slate-400 text-[10px] mt-1">Please ensure WebGL is enabled in your browser graphics settings.</p>';
+      fallback.innerHTML = '<p class="font-bold text-amber-400">WebGL 3D Context Unavailable</p><p class="text-slate-400 text-[11px] mt-1">Please ensure WebGL is enabled in your browser graphics settings.</p>';
       container.appendChild(fallback);
       return;
     }
@@ -105,7 +105,7 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
       createAxis(new THREE.Vector3(0, 0, -axisLen), new THREE.Vector3(0, 0, axisLen), 0xf59e0b);
 
       // Basis markers & labels
-      const createMarker = (pos, color, text) => {
+      const createMarker = (pos, color, text, axis) => {
         const dot = new THREE.Mesh(
           new THREE.SphereGeometry(0.035, 12, 12),
           new THREE.MeshBasicMaterial({ color })
@@ -114,18 +114,18 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
         group.add(dot);
 
         const label = document.createElement('div');
-        label.className = 'quantum-label';
+        label.className = `quantum-label axis-${axis}`;
         label.innerText = text;
         container.appendChild(label);
         labelElements.push({ element: label, position: pos.clone(), parent: group });
       };
 
-      createMarker(new THREE.Vector3(0, R, 0), 0x38bdf8, '|0⟩ (Z+)');
-      createMarker(new THREE.Vector3(0, -R, 0), 0x38bdf8, '|1⟩ (Z-)');
-      createMarker(new THREE.Vector3(R, 0, 0), 0x10b981, '|+⟩ (X+)');
-      createMarker(new THREE.Vector3(-R, 0, 0), 0x10b981, '|-⟩ (X-)');
-      createMarker(new THREE.Vector3(0, 0, R), 0xf59e0b, '|+i⟩ (Y+)');
-      createMarker(new THREE.Vector3(0, 0, -R), 0xf59e0b, '|-i⟩ (Y-)');
+      createMarker(new THREE.Vector3(0, R, 0), 0x38bdf8, '|0⟩ (Z+)', 'z');
+      createMarker(new THREE.Vector3(0, -R, 0), 0x38bdf8, '|1⟩ (Z-)', 'z');
+      createMarker(new THREE.Vector3(R, 0, 0), 0x10b981, '|+⟩ (X+)', 'x');
+      createMarker(new THREE.Vector3(-R, 0, 0), 0x10b981, '|-⟩ (X-)', 'x');
+      createMarker(new THREE.Vector3(0, 0, R), 0xf59e0b, '|+i⟩ (Y+)', 'y');
+      createMarker(new THREE.Vector3(0, 0, -R), 0xf59e0b, '|-i⟩ (Y-)', 'y');
 
       // State arrow
       const arrowGroup = new THREE.Group();
@@ -287,8 +287,12 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
         item.element.style.display = 'block';
         const wp = item.position.clone();
         item.parent.localToWorld(wp);
+        // Dim only labels on the far hemisphere (facing away from the camera)
+        const center = item.parent.getWorldPosition(new THREE.Vector3());
+        const facing = wp.clone().sub(center).dot(camera.position.clone().sub(center));
         const sp = wp.project(camera);
-        item.element.style.opacity = sp.z > 0.95 ? '0.2' : '0.9';
+        item.element.style.opacity = facing < -0.05 ? '0.55' : '1';
+        item.element.style.zIndex = facing < -0.05 ? '1' : '2';
         item.element.style.left = `${(sp.x * wHalf) + wHalf}px`;
         item.element.style.top = `${-(sp.y * hHalf) + hHalf}px`;
       });

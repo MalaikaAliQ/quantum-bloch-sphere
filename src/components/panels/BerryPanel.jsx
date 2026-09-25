@@ -13,7 +13,7 @@ export default function BerryPanel() {
           When a qubit undergoes a cyclic adiabatic or geodesic evolution along a closed trajectory C on the Bloch sphere, it acquires an invariant geometric phase γ_g directly equal to half the enclosed solid angle Ω:
         </p>
         <div className="p-2 rounded bg-slate-900/90 border border-cyan-900/50 text-[11px] font-mono text-cyan-300 text-center">
-          <KaTeXBlock math="\\gamma_g = -\\frac{1}{2}\\Omega(C) = -\\frac{1}{2}\\oint_C (1 - \\cos\\theta)\\,d\\phi" />
+          <KaTeXBlock math={"\\gamma_g = -\\frac{1}{2}\\Omega(C) = -\\frac{1}{2}\\oint_C (1 - \\cos\\theta)\\,d\\phi"} />
         </div>
       </div>
 
@@ -34,13 +34,13 @@ export default function BerryPanel() {
           <div className="flex justify-between">
             <span className="text-slate-400">Total Phase Accumulation:</span>
             <span className="text-emerald-300 font-bold">
-              <KaTeXBlock math="e^{i\\gamma_g} = \\frac{1-i}{\\sqrt{2}}" display={false} />
+              <KaTeXBlock math={"e^{i\\gamma_g} = \\frac{1-i}{\\sqrt{2}}"} display={false} />
             </span>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button onClick={startBerryLoopAnimation}
-            className="py-2 px-3 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition">
+            className="py-2 px-3 rounded-lg bg-cyan-700 hover:bg-cyan-600 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition">
             <Play className="w-3.5 h-3.5" /> Traverse Loop
           </button>
           <button onClick={clearBerryLoop}

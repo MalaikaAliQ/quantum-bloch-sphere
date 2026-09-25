@@ -24,7 +24,7 @@ export default function InfoModal({ onClose }) {
               A pure state in ℂ² is written as |ψ⟩ = c₀|0⟩ + c₁|1⟩ with |c₀|² + |c₁|² = 1. Factoring out an overall unobservable global phase, any state is mapped to coordinates on the unit sphere:
             </p>
             <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 font-mono text-cyan-200">
-              <KaTeXBlock math="|\\psi\\rangle = \\cos\\left(\\frac{\\theta}{2}\\right)|0\\rangle + e^{i\\phi}\\sin\\left(\\frac{\\theta}{2}\\right)|1\\rangle" />
+              <KaTeXBlock math={"|\\psi\\rangle = \\cos\\left(\\frac{\\theta}{2}\\right)|0\\rangle + e^{i\\phi}\\sin\\left(\\frac{\\theta}{2}\\right)|1\\rangle"} />
             </div>
             <p>
               The Bloch vector r⃗ = (rₓ, rᵧ, r_z) = (sinθcosφ, sinθsinφ, cosθ) represents the expectation values of the Pauli spin vector.
@@ -65,7 +65,7 @@ export default function InfoModal({ onClose }) {
         </div>
 
         <div className="p-4 border-t border-slate-800 bg-slate-900/60 flex justify-end">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs transition">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-cyan-700 hover:bg-cyan-600 text-white font-medium text-xs transition">
             Close Guide
           </button>
         </div>

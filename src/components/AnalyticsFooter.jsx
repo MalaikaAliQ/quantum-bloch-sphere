@@ -68,7 +68,7 @@ export default function AnalyticsFooter() {
     ctx.clearRect(0, 0, w, h);
 
     // Guide ring
-    ctx.strokeStyle = '#334155';
+    ctx.strokeStyle = '#64748b';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cx, cy, rad, 0, 2 * Math.PI);
@@ -106,9 +106,9 @@ export default function AnalyticsFooter() {
 
         {/* Column 1: State Vector */}
         <div className="space-y-1.5 border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
-          <div className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold flex items-center justify-between">
+          <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold flex items-center justify-between">
             <span>State Vector |ψ⟩</span>
-            <span className="text-cyan-400 font-bold">[{rx}, {ry}, {rz}]</span>
+            <span className="text-cyan-400 font-bold whitespace-nowrap normal-case tracking-normal">[{rx}, {ry}, {rz}]</span>
           </div>
           <div className="text-xs text-cyan-200 overflow-x-auto py-1">
             <KaTeXBlock math={`|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{\\theta}{2})|1\\rangle`} display={false} />
@@ -120,23 +120,23 @@ export default function AnalyticsFooter() {
 
         {/* Column 2: Complex Amplitudes & Phasor */}
         <div className="space-y-1.5 border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
-          <div className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold flex items-center justify-between">
+          <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold flex items-center justify-between">
             <span>Complex Amplitudes</span>
-            <span className="text-[10px] text-slate-500">Phasor Plane</span>
+            <span className="text-[11px] text-slate-500">Phasor Plane</span>
           </div>
           <div className="flex items-center gap-3">
             <canvas ref={phasorRef} width={60} height={60} className="rounded-full bg-slate-900 border border-slate-800 shrink-0" />
-            <div className="text-[10px] space-y-0.5 leading-tight">
+            <div className="text-[11px] space-y-0.5 leading-tight">
               <div>α = <span className="text-cyan-300">{cosHalf.toFixed(3)} ∠ 0°</span></div>
               <div>β = <span className="text-purple-300">{sinHalf.toFixed(3)} ∠ {Math.round(phi * 180 / Math.PI)}°</span></div>
-              <div className="text-slate-400 text-[9px] pt-1">Δφ = <span className="text-amber-300">{Math.round(phi * 180 / Math.PI)}°</span></div>
+              <div className="text-slate-400 text-[10.5px] pt-1">Δφ = <span className="text-amber-300">{Math.round(phi * 180 / Math.PI)}°</span></div>
             </div>
           </div>
         </div>
 
         {/* Column 3: Probabilities */}
         <div className="space-y-1.5 border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
-          <div className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+          <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
             Measurement Probabilities
           </div>
           <div>
@@ -161,11 +161,11 @@ export default function AnalyticsFooter() {
 
         {/* Column 4: Density Matrix */}
         <div className="space-y-1">
-          <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
             <span>Density Matrix ρ</span>
             <span className="text-purple-300 font-bold">γ={purity} | S={entropy}</span>
           </div>
-          <div className="p-1.5 rounded bg-slate-950/80 border border-slate-800/80 font-mono text-[10px] text-purple-200 overflow-x-auto">
+          <div className="p-1.5 rounded bg-slate-950/80 border border-slate-800/80 font-mono text-[11px] text-purple-200 overflow-x-auto">
             <KaTeXBlock math={matrixLatex} display={true} />
           </div>
         </div>

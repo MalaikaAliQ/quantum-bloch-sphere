@@ -77,11 +77,11 @@ export default function App() {
           <div>
             <h1 className="text-sm md:text-base font-bold tracking-wider text-slate-100 flex items-center gap-2">
               QUANTUM BLOCH SPHERE
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono border border-cyan-500/30">
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono border border-cyan-500/30">
                 MASTER &amp; GRAD SUITE
               </span>
             </h1>
-            <p className="text-[10px] text-slate-400 font-mono hidden lg:block">
+            <p className="text-[11px] text-slate-400 font-mono hidden lg:block">
               Geometry, Open Dynamics, Berry Phase, Entanglement &amp; Kickback
             </p>
           </div>

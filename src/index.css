@@ -16,10 +16,10 @@ body {
 }
 
 .glass-panel {
-  background: rgba(15, 23, 42, 0.82);
+  background: rgba(12, 19, 36, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.22);
   box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.5);
 }
 
@@ -49,16 +49,24 @@ input[type=range] {
 
 .quantum-label {
   position: absolute;
-  color: #e2e8f0;
+  color: #f1f5f9;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(3, 7, 18, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.35);
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  text-shadow: 0 0 6px rgba(0,0,0,0.95), 0 0 10px rgba(6,182,212,0.9);
+  transform: translate(-50%, -150%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
   transition: opacity 0.12s ease-out;
 }
+.quantum-label.axis-z { color: #7dd3fc; border-color: rgba(56, 189, 248, 0.55); }
+.quantum-label.axis-x { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.55); }
+.quantum-label.axis-y { color: #fcd34d; border-color: rgba(245, 158, 11, 0.55); }
 
 @keyframes collapse-flare {
   0% { transform: scale(0.2); opacity: 1; }
@@ -77,5 +85,6 @@ input[type=range] {
 }
 
 /* KaTeX overrides for dark theme */
+.katex-display { margin: 0.35em 0 !important; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
 .katex { color: inherit !important; }
 .katex .mord { color: inherit !important; }

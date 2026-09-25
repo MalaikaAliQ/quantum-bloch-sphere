@@ -25,8 +25,8 @@ export default function EntanglePanel() {
         <p className="text-[11px] text-slate-300 leading-relaxed">
           When two qubits entangle, tracing out system B produces a mixed single-qubit state:
         </p>
-        <div className="p-2 rounded bg-slate-900 border border-slate-800 text-[10px] font-mono text-cyan-200">
-          <KaTeXBlock math="\\rho_A = (1-p)|0\\rangle\\langle 0| + p|1\\rangle\\langle 1| \\implies \\vec{r}_A = (0, 0, 1 - 2p)" />
+        <div className="p-2 rounded bg-slate-900 border border-slate-800 text-[11px] font-mono text-cyan-200">
+          <KaTeXBlock math={"\\rho_A = (1-p)|0\\rangle\\langle 0| + p|1\\rangle\\langle 1| \\implies \\vec{r}_A = (0, 0, 1 - 2p)"} />
         </div>
       </div>
 
@@ -74,7 +74,7 @@ function ConcurrenceSlider() {
       <input type="range" id="concurrence-slider-react" min="0" max="1" step="0.02" value={c}
         onChange={(e) => setEntanglementConcurrence(parseFloat(e.target.value))}
         className="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
-      <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+      <div className="flex justify-between text-[11px] text-slate-500 font-mono">
         <span>0 (Product |00⟩)</span><span>0.5</span><span>1.0 (Bell State Φ+)</span>
       </div>
     </div>
