@@ -2,13 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Theme surface tokens (palette shades themselves come from tailwind.config.js) ---- */
+:root {
+  color-scheme: dark;
+  --page-bg: #030712;
+  --glass-bg: rgba(12, 19, 36, 0.92);
+  --glass-border: rgba(56, 189, 248, 0.22);
+  --glass-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.5);
+  --scroll-track: rgba(15, 23, 42, 0.6);
+  --scroll-thumb: #0284c7;
+  --scroll-thumb-hover: #38bdf8;
+  --range-accent: #06b6d4;
+  --range-accent-phase: #a78bfa;
+  --label-bg: rgba(3, 7, 18, 0.78);
+  --label-text: #f1f5f9;
+  --label-border: rgba(148, 163, 184, 0.35);
+  --label-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  --label-z: #7dd3fc;
+  --label-x: #6ee7b7;
+  --label-y: #fcd34d;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page-bg: #e8edf4;
+  --glass-bg: rgba(255, 255, 255, 0.94);
+  --glass-border: rgba(8, 145, 178, 0.22);
+  --glass-shadow: 0 8px 28px 0 rgba(15, 23, 42, 0.10);
+  --scroll-track: rgba(203, 213, 225, 0.6);
+  --scroll-thumb: #0891b2;
+  --scroll-thumb-hover: #0e7490;
+  --range-accent: #0891b2;
+  --range-accent-phase: #7c3aed;
+  --label-bg: rgba(255, 255, 255, 0.92);
+  --label-text: #0f172a;
+  --label-border: rgba(71, 85, 105, 0.35);
+  --label-shadow: none;
+  --label-z: #0e7490;
+  --label-x: #047857;
+  --label-y: #b45309;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   user-select: none;
   overflow: hidden;
-  background-color: #030712;
+  background-color: var(--page-bg);
   margin: 0;
   padding: 0;
+  transition: background-color 0.2s ease;
 }
 
 .font-mono {
@@ -16,20 +57,43 @@ body {
 }
 
 .glass-panel {
-  background: rgba(12, 19, 36, 0.92);
+  background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(56, 189, 248, 0.22);
-  box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.5);
-}
-
-.glass-card {
-  background: rgba(30, 41, 59, 0.55);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 input[type=range] {
-  accent-color: #06b6d4;
+  accent-color: var(--range-accent);
+}
+input[type=range].accent-violet {
+  accent-color: var(--range-accent-phase);
+}
+/* ---- Typography roles: Inter for words, JetBrains Mono for numbers & notation ---- */
+@layer components {
+  .section-title {
+    @apply flex items-center gap-1.5 font-sans text-xs font-semibold uppercase tracking-[0.06em];
+  }
+  .field-label {
+    @apply font-sans text-[13px] text-slate-300;
+  }
+  .hint {
+    @apply font-sans text-xs leading-relaxed text-slate-400;
+  }
+  .value {
+    @apply font-mono text-[13px] font-semibold tabular-nums;
+  }
+
+  /* ---- Semantic tones: Z = cyan, X = emerald, Y = amber, H = neutral, measurement = rose ---- */
+  .tone-btn {
+    @apply rounded-lg border bg-slate-900 transition-colors duration-150;
+  }
+  .tone-z { @apply border-cyan-500/35 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-400/70; }
+  .tone-x { @apply border-emerald-500/35 text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-400/70; }
+  .tone-y { @apply border-amber-500/35 text-amber-300 hover:bg-amber-500/10 hover:border-amber-400/70; }
+  .tone-h { @apply border-slate-500/45 text-slate-100 hover:bg-slate-500/15 hover:border-slate-300/70; }
+  .tone-m { @apply border-rose-500/40 bg-rose-950/40 text-rose-200 hover:bg-rose-900/50 hover:border-rose-400/70; }
 }
 
 ::-webkit-scrollbar {
@@ -37,37 +101,36 @@ input[type=range] {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--scroll-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #0284c7;
+  background: var(--scroll-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #38bdf8;
+  background: var(--scroll-thumb-hover);
 }
 
 .quantum-label {
   position: absolute;
-  color: #f1f5f9;
+  color: var(--label-text);
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
   padding: 2px 7px;
   border-radius: 6px;
-  background: rgba(3, 7, 18, 0.78);
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: var(--label-bg);
+  border: 1px solid var(--label-border);
   pointer-events: none;
   transform: translate(-50%, -150%);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  text-shadow: var(--label-shadow);
   white-space: nowrap;
   transition: opacity 0.12s ease-out;
 }
-.quantum-label.axis-z { color: #7dd3fc; border-color: rgba(56, 189, 248, 0.55); }
-.quantum-label.axis-x { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.55); }
-.quantum-label.axis-y { color: #fcd34d; border-color: rgba(245, 158, 11, 0.55); }
-
+.quantum-label.axis-z { color: var(--label-z); border-color: rgba(56, 189, 248, 0.55); }
+.quantum-label.axis-x { color: var(--label-x); border-color: rgba(16, 185, 129, 0.55); }
+.quantum-label.axis-y { color: var(--label-y); border-color: rgba(245, 158, 11, 0.55); }
 @keyframes collapse-flare {
   0% { transform: scale(0.2); opacity: 1; }
   100% { transform: scale(2.5); opacity: 0; }
@@ -88,3 +151,6 @@ input[type=range] {
 .katex-display { margin: 0.35em 0 !important; overflow-x: auto; overflow-y: hidden; padding-bottom: 2px; }
 .katex { color: inherit !important; }
 .katex .mord { color: inherit !important; }
+
+/* Footer math rows: tighter display spacing so formulas align with neighbouring text */
+.math-row .katex-display { margin: 0.1em 0 !important; }

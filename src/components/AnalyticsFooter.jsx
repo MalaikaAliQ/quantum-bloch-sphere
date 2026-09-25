@@ -2,7 +2,12 @@ import { useEffect, useRef } from 'react';
 import { useQuantumStore } from '../store/quantumStore';
 import KaTeXBlock from './KaTeXBlock';
 
-export default function AnalyticsFooter() {
+const PHASOR_COLORS = {
+  dark: { guide: '#64748b', alpha: '#06b6d4', beta: '#a855f7' },
+  light: { guide: '#94a3b8', alpha: '#0891b2', beta: '#7c3aed' },
+};
+
+export default function AnalyticsFooter({ theme = 'dark' }) {
   const { qState } = useQuantumStore();
   const phasorRef = useRef(null);
 
@@ -65,10 +70,11 @@ export default function AnalyticsFooter() {
     const cx = w / 2, cy = h / 2;
     const rad = w * 0.42;
 
+    const palette = PHASOR_COLORS[theme] || PHASOR_COLORS.dark;
     ctx.clearRect(0, 0, w, h);
 
     // Guide ring
-    ctx.strokeStyle = '#64748b';
+    ctx.strokeStyle = palette.guide;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cx, cy, rad, 0, 2 * Math.PI);
@@ -81,7 +87,7 @@ export default function AnalyticsFooter() {
     ctx.stroke();
 
     // Alpha phasor
-    ctx.strokeStyle = '#06b6d4';
+    ctx.strokeStyle = palette.alpha;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(cx, cy);
@@ -90,82 +96,88 @@ export default function AnalyticsFooter() {
 
     // Beta phasor
     const bLen = sinHalf * rad;
-    ctx.strokeStyle = '#a855f7';
+    ctx.strokeStyle = palette.beta;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx + bLen * Math.cos(-phi), cy + bLen * Math.sin(-phi));
     ctx.stroke();
-  }, [cosHalf, sinHalf, phi]);
+  }, [cosHalf, sinHalf, phi, theme]);
 
   const matrixLatex = `\\rho = \\begin{pmatrix} ${rho00} & ${offDiag01} \\\\ ${offDiag10} & ${rho11} \\end{pmatrix}`;
 
+  // Columns sit 2×2 below 1536px wide so formulas and headings are never clipped
+  const col = 'min-w-0 space-y-2 2xl:border-r 2xl:border-slate-800 2xl:pr-5';
+  const degPhi = Math.round(phi * 180 / Math.PI);
+
   return (
-    <div className="absolute bottom-4 left-4 right-4 glass-panel rounded-2xl p-4 border border-cyan-500/20 z-10 shadow-2xl">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
+    <div id="analytics-footer" className="absolute bottom-4 left-4 right-4 glass-panel rounded-2xl px-5 py-3.5 border border-cyan-500/20 z-10 shadow-2xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-x-6 gap-y-3 text-[13px]">
 
         {/* Column 1: State Vector */}
-        <div className="space-y-1.5 border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
-          <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold flex items-center justify-between">
-            <span>State Vector |ψ⟩</span>
-            <span className="text-cyan-400 font-bold whitespace-nowrap normal-case tracking-normal">[{rx}, {ry}, {rz}]</span>
+        <div className={col}>
+          <div className="section-title text-slate-400 justify-between flex-wrap gap-x-3">
+            <span className="whitespace-nowrap">State vector |ψ⟩</span>
+            <span className="font-mono text-xs text-cyan-300 font-semibold whitespace-nowrap normal-case tracking-normal tabular-nums">[{rx}, {ry}, {rz}]</span>
           </div>
-          <div className="text-xs text-cyan-200 overflow-x-auto py-1">
-            <KaTeXBlock math={`|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{\\theta}{2})|1\\rangle`} display={false} />
+          <div className="math-row text-slate-200 overflow-x-auto overflow-y-hidden">
+            <KaTeXBlock math={`|\\psi\\rangle = \\cos(\\tfrac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\tfrac{\\theta}{2})|1\\rangle`} display={false} />
           </div>
-          <div className="text-[11px] text-slate-300">
+          <div className="math-row text-slate-200 overflow-x-auto overflow-y-hidden">
             <KaTeXBlock math={`|\\psi\\rangle = ${stateStr}`} display={false} />
           </div>
         </div>
 
         {/* Column 2: Complex Amplitudes & Phasor */}
-        <div className="space-y-1.5 border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
-          <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold flex items-center justify-between">
-            <span>Complex Amplitudes</span>
-            <span className="text-[11px] text-slate-500">Phasor Plane</span>
+        <div className={col}>
+          <div className="section-title text-slate-400 justify-between gap-x-3">
+            <span className="whitespace-nowrap">Complex amplitudes</span>
+            <span className="normal-case tracking-normal font-normal text-slate-500 whitespace-nowrap">Phasor plane</span>
           </div>
-          <div className="flex items-center gap-3">
-            <canvas ref={phasorRef} width={60} height={60} className="rounded-full bg-slate-900 border border-slate-800 shrink-0" />
-            <div className="text-[11px] space-y-0.5 leading-tight">
-              <div>α = <span className="text-cyan-300">{cosHalf.toFixed(3)} ∠ 0°</span></div>
-              <div>β = <span className="text-purple-300">{sinHalf.toFixed(3)} ∠ {Math.round(phi * 180 / Math.PI)}°</span></div>
-              <div className="text-slate-400 text-[10.5px] pt-1">Δφ = <span className="text-amber-300">{Math.round(phi * 180 / Math.PI)}°</span></div>
+          <div className="flex items-center gap-4">
+            <canvas ref={phasorRef} width={64} height={64} className="rounded-full bg-slate-900 border border-slate-800 shrink-0" />
+            <div className="font-mono text-[13px] space-y-1 leading-snug tabular-nums">
+              <div className="text-slate-300">α = <span className="text-cyan-300 font-semibold">{cosHalf.toFixed(3)} ∠ 0°</span></div>
+              <div className="text-slate-300">β = <span className="text-violet-300 font-semibold">{sinHalf.toFixed(3)} ∠ {degPhi}°</span></div>
+              <div className="text-slate-400 text-xs">Δφ = <span className="text-amber-300 font-semibold">{degPhi}°</span></div>
             </div>
           </div>
         </div>
 
         {/* Column 3: Probabilities */}
-        <div className="space-y-1.5 border-b md:border-b-0 md:border-r border-slate-800 pb-3 md:pb-0 md:pr-4">
-          <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-            Measurement Probabilities
+        <div className={col}>
+          <div className="section-title text-slate-400">
+            <span className="whitespace-nowrap">Measurement probabilities</span>
           </div>
-          <div>
-            <div className="flex justify-between text-[11px]">
-              <span className="text-cyan-300">P(|0⟩) = |α|²</span>
-              <span className="text-slate-200 font-bold">{(p0 * 100).toFixed(1)}%</span>
+          <div className="space-y-2.5">
+            <div>
+              <div className="flex justify-between font-mono text-[13px] tabular-nums">
+                <span className="text-cyan-300">P(|0⟩) = |α|²</span>
+                <span className="text-slate-100 font-bold">{(p0 * 100).toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                <div className="h-full bg-cyan-400 transition-all duration-150" style={{ width: `${p0 * 100}%` }} />
+              </div>
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-0.5">
-              <div className="h-full bg-cyan-400 transition-all duration-150" style={{ width: `${p0 * 100}%` }} />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between text-[11px]">
-              <span className="text-rose-400">P(|1⟩) = |β|²</span>
-              <span className="text-slate-200 font-bold">{(p1 * 100).toFixed(1)}%</span>
-            </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-0.5">
-              <div className="h-full bg-rose-500 transition-all duration-150" style={{ width: `${p1 * 100}%` }} />
+            <div>
+              <div className="flex justify-between font-mono text-[13px] tabular-nums">
+                <span className="text-rose-300">P(|1⟩) = |β|²</span>
+                <span className="text-slate-100 font-bold">{(p1 * 100).toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                <div className="h-full bg-rose-500 transition-all duration-150" style={{ width: `${p1 * 100}%` }} />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Column 4: Density Matrix */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-            <span>Density Matrix ρ</span>
-            <span className="text-purple-300 font-bold">γ={purity} | S={entropy}</span>
+        <div className="min-w-0 space-y-2">
+          <div className="section-title text-slate-400 justify-between gap-x-3">
+            <span className="whitespace-nowrap">Density matrix ρ</span>
+            <span className="font-mono text-xs normal-case tracking-normal text-violet-300 font-semibold whitespace-nowrap tabular-nums">γ = {purity} · S = {entropy}</span>
           </div>
-          <div className="p-1.5 rounded bg-slate-950/80 border border-slate-800/80 font-mono text-[11px] text-purple-200 overflow-x-auto">
+          <div className="math-row px-2 py-1 rounded-lg bg-slate-950/80 border border-slate-800/80 text-slate-200 overflow-x-auto overflow-y-hidden">
             <KaTeXBlock math={matrixLatex} display={true} />
           </div>
         </div>

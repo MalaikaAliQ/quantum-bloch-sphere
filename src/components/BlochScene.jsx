@@ -9,7 +9,21 @@ import {
 
 const MAX_TRAIL_POINTS = 220;
 
-export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
+// Scene colours per UI theme (axis hues match the panel tones: Z = cyan, X = emerald, Y = amber)
+const SCENE_THEMES = {
+  dark: {
+    fog: 0x030712, sphere: 0x0f172a, sphereOpacity: 0.28, wire: 0x38bdf8, wireOpacity: 0.08,
+    ring: 0x38bdf8, ringOpacity: 0.45, grid: 0x1e3a5f, gridOpacity: 0.9,
+    axisZ: 0x38bdf8, axisX: 0x10b981, axisY: 0xf59e0b, axisOpacity: 0.65, proj: 0xe2e8f0, tip: 0xffffff,
+  },
+  light: {
+    fog: 0xe8edf4, sphere: 0xcfe3f1, sphereOpacity: 0.4, wire: 0x0e7490, wireOpacity: 0.13,
+    ring: 0x0891b2, ringOpacity: 0.7, grid: 0x94a3b8, gridOpacity: 0.55,
+    axisZ: 0x0284c7, axisX: 0x059669, axisY: 0xd97706, axisOpacity: 0.9, proj: 0x475569, tip: 0x0f172a,
+  },
+};
+
+export default function BlochScene({ theme = 'dark', detuning, rabiFreq, onLabelsReady }) {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const frameIdRef = useRef(null);
@@ -21,18 +35,24 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
   useEffect(() => { detuningRef.current = detuning ?? 0; }, [detuning]);
   useEffect(() => { rabiRef.current = rabiFreq ?? 1.2; }, [rabiFreq]);
 
+  const themeRef = useRef(theme);
+  useEffect(() => {
+    themeRef.current = theme;
+    sceneRef.current?.applyTheme?.(theme);
+  }, [theme]);
+
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
 
     // ---- SCENE SETUP ----
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030712, 0.035);
+    scene.fog = new THREE.FogExp2(SCENE_THEMES.dark.fog, 0.035);
 
     const w = container.clientWidth || 800;
     const h = container.clientHeight || 600;
     const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
-    camera.position.set(2.8, 1.8, 3.2);
+    camera.position.set(3.0, 1.95, 3.45);
 
     let renderer;
     try {
@@ -66,6 +86,9 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
 
     // ---- CREATE BLOCH SPHERE ----
     const labelElements = [];
+    // Callbacks that recolour scene objects for the active theme
+    const themeAppliers = [];
+    const themed = (fn) => { themeAppliers.push(fn); fn(SCENE_THEMES[themeRef.current] || SCENE_THEMES.dark); };
 
     function createBlochSphereObject(primaryColorHex) {
       const group = new THREE.Group();
@@ -73,43 +96,55 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
 
       // Transparent sphere
       const sphereGeo = new THREE.SphereGeometry(R, 48, 48);
-      group.add(new THREE.Mesh(sphereGeo, new THREE.MeshPhysicalMaterial({
+      const sphereMat = new THREE.MeshPhysicalMaterial({
         color: 0x0f172a, transparent: true, opacity: 0.28,
         roughness: 0.1, metalness: 0.1, transmission: 0.7, ior: 1.15,
-      })));
+      });
+      group.add(new THREE.Mesh(sphereGeo, sphereMat));
+      themed((t) => { sphereMat.color.setHex(t.sphere); sphereMat.opacity = t.sphereOpacity; });
 
       // Wireframe
-      group.add(new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({
+      const wireMat = new THREE.MeshBasicMaterial({
         color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.08,
-      })));
+      });
+      group.add(new THREE.Mesh(sphereGeo, wireMat));
+      themed((t) => { wireMat.color.setHex(t.wire); wireMat.opacity = t.wireOpacity; });
 
       // Equatorial ring
       const ringGeo = new THREE.RingGeometry(R * 0.99, R * 1.01, 64);
-      const equatorRing = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({
+      const ringMat = new THREE.MeshBasicMaterial({
         color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.45,
-      }));
+      });
+      const equatorRing = new THREE.Mesh(ringGeo, ringMat);
+      themed((t) => { ringMat.color.setHex(t.ring); ringMat.opacity = t.ringOpacity; });
       equatorRing.rotation.x = Math.PI / 2;
       group.add(equatorRing);
 
       // Polar grid
-      group.add(new THREE.PolarGridHelper(R, 8, 4, 32, 0x1e293b, 0x0f2744));
+      const polarGrid = new THREE.PolarGridHelper(R, 8, 4, 32);
+      polarGrid.material.vertexColors = false;
+      polarGrid.material.transparent = true;
+      group.add(polarGrid);
+      themed((t) => { polarGrid.material.color.setHex(t.grid); polarGrid.material.opacity = t.gridOpacity; polarGrid.material.needsUpdate = true; });
 
       // Axes
       const axisLen = R * 1.45;
-      const createAxis = (start, end, color) => {
+      const createAxis = (start, end, key) => {
         const geo = new THREE.BufferGeometry().setFromPoints([start, end]);
-        group.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.65 })));
+        const mat = new THREE.LineBasicMaterial({ transparent: true });
+        group.add(new THREE.Line(geo, mat));
+        themed((t) => { mat.color.setHex(t[key]); mat.opacity = t.axisOpacity; });
       };
-      createAxis(new THREE.Vector3(0, -axisLen, 0), new THREE.Vector3(0, axisLen, 0), 0x38bdf8);
-      createAxis(new THREE.Vector3(-axisLen, 0, 0), new THREE.Vector3(axisLen, 0, 0), 0x10b981);
-      createAxis(new THREE.Vector3(0, 0, -axisLen), new THREE.Vector3(0, 0, axisLen), 0xf59e0b);
+      createAxis(new THREE.Vector3(0, -axisLen, 0), new THREE.Vector3(0, axisLen, 0), 'axisZ');
+      createAxis(new THREE.Vector3(-axisLen, 0, 0), new THREE.Vector3(axisLen, 0, 0), 'axisX');
+      createAxis(new THREE.Vector3(0, 0, -axisLen), new THREE.Vector3(0, 0, axisLen), 'axisY');
 
       // Basis markers & labels
-      const createMarker = (pos, color, text, axis) => {
-        const dot = new THREE.Mesh(
-          new THREE.SphereGeometry(0.035, 12, 12),
-          new THREE.MeshBasicMaterial({ color })
-        );
+      const createMarker = (pos, text, axis) => {
+        const dotMat = new THREE.MeshBasicMaterial();
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 12), dotMat);
+        const colorKey = { z: 'axisZ', x: 'axisX', y: 'axisY' }[axis];
+        themed((t) => dotMat.color.setHex(t[colorKey]));
         dot.position.copy(pos);
         group.add(dot);
 
@@ -120,12 +155,12 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
         labelElements.push({ element: label, position: pos.clone(), parent: group });
       };
 
-      createMarker(new THREE.Vector3(0, R, 0), 0x38bdf8, '|0⟩ (Z+)', 'z');
-      createMarker(new THREE.Vector3(0, -R, 0), 0x38bdf8, '|1⟩ (Z-)', 'z');
-      createMarker(new THREE.Vector3(R, 0, 0), 0x10b981, '|+⟩ (X+)', 'x');
-      createMarker(new THREE.Vector3(-R, 0, 0), 0x10b981, '|-⟩ (X-)', 'x');
-      createMarker(new THREE.Vector3(0, 0, R), 0xf59e0b, '|+i⟩ (Y+)', 'y');
-      createMarker(new THREE.Vector3(0, 0, -R), 0xf59e0b, '|-i⟩ (Y-)', 'y');
+      createMarker(new THREE.Vector3(0, R, 0), '|0⟩ (Z+)', 'z');
+      createMarker(new THREE.Vector3(0, -R, 0), '|1⟩ (Z-)', 'z');
+      createMarker(new THREE.Vector3(R, 0, 0), '|+⟩ (X+)', 'x');
+      createMarker(new THREE.Vector3(-R, 0, 0), '|-⟩ (X-)', 'x');
+      createMarker(new THREE.Vector3(0, 0, R), '|+i⟩ (Y+)', 'y');
+      createMarker(new THREE.Vector3(0, 0, -R), '|-i⟩ (Y-)', 'y');
 
       // State arrow
       const arrowGroup = new THREE.Group();
@@ -139,19 +174,22 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
       }));
       cone.position.y = 1;
       arrowGroup.add(cone);
-      const tipOrb = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+      const tipMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const tipOrb = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 16), tipMat);
+      themed((t) => tipMat.color.setHex(t.tip));
       tipOrb.position.y = 1;
       arrowGroup.add(tipOrb);
       group.add(arrowGroup);
 
       // Projections
-      const projMat = new THREE.LineDashedMaterial({ color: 0x94a3b8, dashSize: 0.05, gapSize: 0.03, transparent: true, opacity: 0.7 });
+      const projMat = new THREE.LineDashedMaterial({ color: 0x94a3b8, dashSize: 0.06, gapSize: 0.035, transparent: true, opacity: 0.95 });
       const projGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
       const projLine = new THREE.Line(projGeo, projMat);
+      themed((t) => projMat.color.setHex(t.proj));
       projLine.computeLineDistances();
       group.add(projLine);
 
-      const projDisk = new THREE.Mesh(new THREE.RingGeometry(0.01, 0.045, 16), new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide }));
+      const projDisk = new THREE.Mesh(new THREE.RingGeometry(0.02, 0.06, 24), new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide }));
       projDisk.rotation.x = Math.PI / 2;
       group.add(projDisk);
 
@@ -298,6 +336,13 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
       });
     }
 
+    function applyTheme(name) {
+      const t = SCENE_THEMES[name] || SCENE_THEMES.dark;
+      scene.fog.color.setHex(t.fog);
+      themeAppliers.forEach((fn) => fn(t));
+    }
+    applyTheme(themeRef.current);
+
     // ---- RESIZE ----
     function onResize() {
       if (!container || !renderer) return;
@@ -305,15 +350,27 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
       const h = container.clientHeight || window.innerHeight;
       if (w > 0 && h > 0) {
         camera.aspect = w / h;
+        // Centre the sphere in the space above the analytics footer instead of behind it
+        const footer = document.getElementById('analytics-footer');
+        const reserved = footer ? footer.offsetHeight + 16 : 0;
+        const offsetY = Math.round(reserved / 2);
+        camera.setViewOffset(w, h, 0, offsetY, w, h);
+        // Shrink the view when the free area above the footer is short, so the poles stay on screen
+        const freeRatio = (h - reserved) / h;
+        camera.zoom = Math.min(1, Math.max(0.55, freeRatio / 0.8));
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
       }
     }
     window.addEventListener('resize', onResize);
+    const footerObserver = new ResizeObserver(onResize);
+    const footerEl = document.getElementById('analytics-footer');
+    if (footerEl) footerObserver.observe(footerEl);
+    onResize();
 
     // Store scene ref for external access (reset camera etc)
     sceneRef.current = {
-      camera, controls, scene,
+      camera, controls, scene, applyTheme,
       blochSingle, getBlochControl: () => blochControl, getBlochTarget: () => blochTarget,
       clearTrail: () => {
         trailPoints.length = 0;
@@ -324,7 +381,7 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
         if (mod === 'kickback') {
           camera.position.set(0, 2.2, 5.5);
         } else {
-          camera.position.set(2.8, 1.8, 3.2);
+          camera.position.set(3.0, 1.95, 3.45);
         }
         controls.target.set(0, 0, 0);
         trailPoints.length = 0;
@@ -345,6 +402,7 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
 
       // Module switching visibility
       if (mod !== lastModule) {
+        const leavingKickback = lastModule === 'kickback';
         lastModule = mod;
         if (mod === 'kickback') {
           ensureKickbackSpheres();
@@ -357,6 +415,11 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
           blochSingle.visible = true;
           if (blochControl) blochControl.visible = false;
           if (blochTarget) blochTarget.visible = false;
+          // Restore the single-sphere viewing angle after the side-by-side kickback view
+          if (leavingKickback) {
+            camera.position.set(3.0, 1.95, 3.45);
+            controls.target.set(0, 0, 0);
+          }
         }
       }
 
@@ -394,6 +457,7 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
     return () => {
       cancelAnimationFrame(frameIdRef.current);
       window.removeEventListener('resize', onResize);
+      footerObserver.disconnect();
       labelElements.forEach(item => item.element.remove());
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);

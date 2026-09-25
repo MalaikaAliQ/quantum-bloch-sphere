@@ -90,6 +90,7 @@ export function setActiveModule(mod) {
 
 export function setAnimSpeed(v) {
   animSpeed = v;
+  emitChange();
 }
 
 export function setShowTrails(v) {
@@ -436,6 +437,8 @@ export function animationStep(speed) {
       qState.phi = qState.startPhi + (qState.targetPhi - qState.startPhi) * t;
       qState.radius = qState.startRadius + (qState.targetRadius - qState.startRadius) * t;
     }
+    // Keep panels and the analytics footer in sync with the animated state
+    emitChange();
   }
 }
 
