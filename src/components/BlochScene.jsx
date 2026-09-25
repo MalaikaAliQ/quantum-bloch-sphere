@@ -29,13 +29,25 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x030712, 0.035);
 
-    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+    const w = container.clientWidth || 800;
+    const h = container.clientHeight || 600;
+    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
     camera.position.set(2.8, 1.8, 3.2);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    container.appendChild(renderer.domElement);
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+    } catch (err) {
+      console.error('WebGL initialization error:', err);
+      const fallback = document.createElement('div');
+      fallback.className = 'w-full h-full flex flex-col items-center justify-center text-cyan-300 font-mono text-xs p-4 text-center';
+      fallback.innerHTML = '<p class="font-bold text-amber-400">WebGL 3D Context Unavailable</p><p class="text-slate-400 text-[10px] mt-1">Please ensure WebGL is enabled in your browser graphics settings.</p>';
+      container.appendChild(fallback);
+      return;
+    }
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -284,12 +296,14 @@ export default function BlochScene({ detuning, rabiFreq, onLabelsReady }) {
 
     // ---- RESIZE ----
     function onResize() {
-      if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      if (!container || !renderer) return;
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      if (w > 0 && h > 0) {
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
     }
     window.addEventListener('resize', onResize);
 

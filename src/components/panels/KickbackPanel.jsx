@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Zap } from 'lucide-react';
 import { useQuantumStore, execKickbackStep } from '../../store/quantumStore';
-import KaTeXBlock from '../KaTeXBlock';
-import katex from 'katex';
+import KaTeXBlock, { renderKaTeX } from '../KaTeXBlock';
 
 const STEP_DESCRIPTIONS = [
   'Step 1: System initialized. Target qubit q₁ set to state |1⟩.',
@@ -24,13 +23,10 @@ export default function KickbackPanel() {
 
   useEffect(() => {
     if (statusRef.current) {
-      // Re-render katex in the status box whenever step changes
       const el = statusRef.current;
       const mathParts = el.querySelectorAll('[data-katex]');
       mathParts.forEach(span => {
-        try {
-          katex.render(span.getAttribute('data-katex'), span, { displayMode: false, throwOnError: false });
-        } catch {}
+        renderKaTeX(span.getAttribute('data-katex'), span, { displayMode: false });
       });
     }
   }, [kickbackStep]);
